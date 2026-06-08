@@ -1,73 +1,69 @@
+; Comments
 (comment) @comment
 
-(null) @constant
-
-(timestamp) @constant
-
-(closure_variables
-  (ident) @label)
-
+; Literals
+(null) @constant.builtin
+(boolean) @boolean
 (integer) @number
-
 (float) @number
+(timestamp) @string.special
 
-[
-  (string)
-  (raw_string)
-] @string
-
-[
-  (raw_string_escape_sequence)
-  (escape_sequence)
-  (regex_escape_sequence)
-] @string.escape
+; Strings
+(string) @string
+(raw_string) @string
+(regex) @string.regexp
+(escape_sequence) @string.escape
+(raw_string_escape_sequence) @string.escape
+(regex_escape_sequence) @string.escape
 
 (string_template
   "{{" @punctuation.special
-  (_)
   "}}" @punctuation.special)
 
-(regex) @string.regex
-
-(boolean) @boolean
-
-(ident) @variable
-
-(noop) @variable.special
-
+; Functions
 (function_call
-  (ident) @function)
+  function_name: (ident) @function)
 
-; VRL queries
+; assert / assert_eq raise errors — highlight distinctly
+(function_call
+  function_name: (ident) @keyword
+  (#any-of? @keyword "assert" "assert_eq"))
+
+; Closure parameters
+(closure_variables
+  (ident) @variable.parameter)
+
+; VRL event/metadata roots (. and %)
 (query
-  [
-    (event)
-    (metadata)
-  ] @variable.special)
+  [(event) (metadata)] @variable.builtin)
 
+; Path fields inside a query
 (query
   (path
-    [
-      (field) @variable
-      (string) @string
-      (index) @number
-      "." @punctuation.delimiter
-    ]))
+    (field) @property
+    (index) @number
+    "." @punctuation.delimiter))
 
-"return" @keyword
+; _ (noop assign target)
+(noop) @variable.builtin
 
-"abort" @keyword
+; Plain identifiers
+(ident) @variable
 
+; Keywords
 [
   "if"
   "else"
+  "return"
+  "abort"
 ] @keyword
 
+; Operators
 [
   "="
+  "|="
   "=="
   "!="
-  "|="
   ">"
   ">="
   "<"
@@ -81,28 +77,16 @@
   "??"
   "|"
   "!"
+  "->"
 ] @operator
 
-[
-  "->"
-  ":"
-  ";"
-  ","
-] @punctuation.delimiter
+; Punctuation
+[":" ";" ","] @punctuation.delimiter
 
 [
-  "("
-  ")"
-  "["
-  "]"
-  "{"
-  "}"
+  "(" ")"
+  "[" "]"
+  "{" "}"
 ] @punctuation.bracket
 
-(closure_variables
-  "|" @punctuation.bracket)
-
-(function_call
-  (ident) @keyword
-  "!"
-  (#any-of? @keyword "assert" "assert_eq"))
+(closure_variables "|" @punctuation.bracket)
