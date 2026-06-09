@@ -40,9 +40,12 @@
 ; Path fields inside a query
 (query
   (path
-    (field) @property
-    (index) @number
-    "." @punctuation.delimiter))
+    [
+      (field) @property
+      (string) @string
+      (index) @number
+      "." @punctuation.delimiter
+    ]))
 
 ; _ (noop assign target)
 (noop) @variable.builtin

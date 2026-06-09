@@ -1,0 +1,86 @@
+# @comment
+# This file exercises all highlight captures in highlights.scm.
+# Open it in Zed to visually verify syntax highlighting.
+
+# Literals: @constant.builtin, @boolean, @number, @string.special
+.null_field  = null
+.bool_field  = true
+.int_field   = 42
+.float_field = 3.14
+.ts_field    = t'2024-01-01T00:00:00Z'
+
+# Strings: @string, @string.escape
+.plain   = "hello, world"
+.escaped = "tab:\t newline:\n end"
+.raw     = s'raw string, no \n escaping here'
+
+# Regex: @string.regexp, @string.escape
+.is_error = match!(.message, r'error|warn\b')
+
+# String templates: {{ and }} are @punctuation.special
+name    = to_string!(.user)
+int_str = to_string!(.int_field)
+.log_line = "user={{ name }}, int={{ int_str }}"
+
+# Event/metadata roots: @variable.builtin
+.event_field = "on the event"
+%meta_field  = "on metadata"
+
+# Path fields: @property, @number (index), @string (quoted key), @punctuation.delimiter (.)
+.nested.path.deep = "value"
+.list[0] = "first"
+.list[1] = "second"
+.spaced_obj = { "key with space": "quoted path" }
+quoted_val = .spaced_obj."key with space"
+
+# Functions: @function
+.upper   = upcase!(.message)
+.trimmed = strip_whitespace!(.message)
+.parsed, err = parse_json(.raw_data)
+
+# assert / assert_eq: @keyword
+assert!(is_string(.upper), "expected a string")
+assert_eq!(.int_field, 42, "wrong value")
+
+# Closures: @variable.parameter
+.upper_tags = map_values(["foo", "bar"]) -> |tag| { upcase!(tag) }
+.big_scores = filter([30, 60, 80]) -> |_index, score| { score > 50 }
+
+# Noop assign target: @variable.builtin (_)
+_, err = parse_json("not json")
+
+# Local variables: @variable
+my_var = "hello"
+my_var = upcase!(my_var)
+
+# Keywords: @keyword
+if .level == "error" {
+    abort
+}
+
+result = if .ok == true {
+    "yes"
+} else {
+    return "no"
+}
+
+# Operators: @operator
+.sum      = 1 + 2
+.diff     = 10 - 3
+.product  = 4 * 5
+.negation = !true
+.or_val   = false || true
+.and_val  = true && false
+.eq_check = 1 == 1
+.ne_check = 1 != 2
+.gt_check = 2 > 1
+.ge_check = 2 >= 2
+.lt_check = 1 < 2
+.le_check = 1 <= 1
+.fallback = parse_int("bad") ?? 0
+.obj = {}
+.obj |= { "extra": true }
+
+# Punctuation: @punctuation.delimiter and @punctuation.bracket
+.obj = { "key": "value", "num": 1 }
+.arr = [1, 2, 3]
